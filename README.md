@@ -4,6 +4,39 @@
 
 参考论文为 Hailong Liang、Qin Tao、Ben Wang 和 Zhaoyang Zhang 的 *Weighted Sum Rate Maximization for Multi-User MIMO-OTFS Systems over High-Mobility Scenarios*，IEEE Journal of Selected Topics in Signal Processing，2026。第 II 节给出信道模型，第 III 节介绍 WMMSE 和基于主导视距径（LoS）的 SVD 预编码，第 IV 节给出数值实验。[随项目附带的论文 PDF](./Weighted_Sum_Rate_Maximization_for_Multi-User_MIMO-OTFS_Systems_over_High-Mobility_Scenarios.pdf) · [DOI](https://doi.org/10.1109/JSTSP.2026.3700518)
 
+## 项目架构
+
+从 [main.m](./main.m) 开始阅读。每次蒙特卡洛迭代先为各用户生成多径信道，再把同一组信道交给五种预编码方案，在各个 SNR 点计算加权和速率。最后，`main.m` 将速率除以 OTFS 格点数 `M*N`，对各次信道实现取平均并绘图。
+
+| 文件或目录 | 在项目中的作用 |
+| --- | --- |
+| [main.m](./main.m) | 设置天线数、网格大小、SNR 和仿真次数，构造近似与完整 CSI 两种 SVD 模型，调用算法并汇总结果。 |
+| [channel_generation.m](./channel_generation.m) | 生成各用户的完整信道矩阵 `H`，同时返回首径的发射方向和复增益，供近似 CSI 方案使用。 |
+| [steeringVec.m](./steeringVec.m) | 计算均匀线阵的导向矢量，供信道生成和首径近似模型共用。 |
+| [functions/](./functions/) | 实现 WMMSE 和四种 SVD 预编码方案，以及迭代更新、功率分配和速率评估所需的辅助函数。 |
+| [sum_rate.m](./sum_rate.m) | 在完整信道上计入用户间干扰和噪声，计算各用户速率并按用户权重求和。五种方案共用此函数。 |
+| [figures/](./figures/) | 存放参考论文的图 1 至图 6，包括系统模型、收发机结构和实验结果。 |
+
+### functions/ 中的函数
+
+**WMMSE** 的入口是 `wmmse_rate.m`。每轮迭代依次更新接收滤波器、误差权重和发射预编码，再调用根目录的 `sum_rate.m` 检查速率变化。
+
+| 文件 | 作用 |
+| --- | --- |
+| [wmmse_rate.m](./functions/wmmse_rate.m) | 初始化各用户的预编码矩阵，控制迭代，并按相对速率变化或迭代次数上限终止。 |
+| [find_U.m](./functions/find_U.m) | 根据当前预编码、信道和噪声协方差，求各用户的线性 MMSE 接收滤波器 `U`。 |
+| [find_W.m](./functions/find_W.m) | 根据接收滤波器和预编码计算估计误差协方差，取其逆得到误差权重矩阵 `W`。 |
+| [find_V_complexity.m](./functions/find_V_complexity.m) | 在每个基站的发射功率预算下，用二分法搜索对偶变量并更新预编码矩阵 `V`。 |
+
+**SVD** 有四个入口。文件名中的 `approx` 和 `perfect` 区分用于设计预编码器的信道信息，`equal` 和 `waterfill` 区分功率分配方式。
+
+| 用于预编码的信道信息 | 等功率 | 注水 |
+| --- | --- | --- |
+| 近似 CSI，使用首径构造的模式 | [svd_approx_equal_rate.m](./functions/svd_approx_equal_rate.m) | [svd_approx_waterfill_rate.m](./functions/svd_approx_waterfill_rate.m) |
+| 完整 CSI，使用完整信道的右奇异向量 | [svd_perfect_equal_rate.m](./functions/svd_perfect_equal_rate.m) | [svd_perfect_waterfill_rate.m](./functions/svd_perfect_waterfill_rate.m) |
+
+两种注水方案调用 [waterfill_impove.m](./functions/waterfill_impove.m)，按模式增益和功率权重分配发射功率。四种 SVD 方案都调用 [svd_precoder_rate.m](./functions/svd_precoder_rate.m)，将预编码矩阵按用户拆分，再交给根目录的 `sum_rate.m` 计算加权和速率。
+
 ## 图 3 实验结果
 
 ![论文图 3：WMMSE 和四种 SVD 预编码方案的平均加权和速率随 SNR 的变化](./figures/figure-3-wsr.png)
