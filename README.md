@@ -12,14 +12,19 @@
 
 ## 运行
 
-需要 MATLAB、Signal Processing Toolbox（`dftmtx`）和 Symbolic Math Toolbox（注水函数使用 `syms`、`solve` 和 `vpa`）。将 MATLAB 当前文件夹设为包含本 README 和 `main.m` 的目录，然后执行：
+在装有 Signal Processing Toolbox 和 Symbolic Math Toolbox 的 MATLAB 中，将当前文件夹切换到仓库根目录（可以看到 `main.m` 和 `functions/`）。在命令窗口运行以下命令。如果希望多次运行使用同一组随机信道，可先执行 `rng(1, 'twister')`。
 
 ```matlab
-rng(1, 'twister')   % 可选。重复实验时使用相同的随机种子
 main
 ```
 
-[main.m](./main.m) 会加载同目录下的 `functions/`，生成随机信道并绘制五条曲线。横轴为 SNR（dB），纵轴为按 OTFS 格点数 `M*N` 归一化、再对信道实现取平均的 WSR（bit/s/Hz）。每种方案的逐次结果保留在 MATLAB 工作区；默认设置下，每个结果矩阵有 200 行（信道实现）和 6 列（SNR 点）。例如，`mean(Rate_SVD_my_ww,1)` 就是图中“近似 CSI + 注水”的六个纵坐标。
+脚本默认生成 200 次随机信道实现（`Mont = 200`），在每次实现上依次计算 0、5、10、15、20、25 dB 下的加权和速率。运行结束后，图窗会显示五种预编码方案在各个 SNR 点的平均速率（bit/s/Hz）。
+
+各方案的逐次结果保存在 MATLAB 工作区的 `200 × 6` 矩阵中，每行对应一次信道实现，每列对应一个 SNR 点。例如，运行以下命令可查看 WMMSE 曲线上六个点的数值，每行依次列出 SNR（dB）和平均加权和速率（bit/s/Hz）。
+
+```matlab
+[Snr(:), mean(Rate_SMMSE, 1).']
+```
 
 ## 五条曲线怎么读
 
