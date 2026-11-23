@@ -1,6 +1,6 @@
 # 多用户 MIMO-OTFS 下行预编码仿真
 
-本项目用 MATLAB 比较单基站为多个用户发送 OTFS 信号时的加权和速率（WSR）。实验对应参考论文图 3：在相同的多径信道上，比较 WMMSE 基线与四种 SVD 预编码方案，观察信噪比从 0 dB 增至 25 dB 时的速率变化。
+本项目为MIMO-OTFS系统的低复杂度加权和速率（WSR）优化方法。实验对应参考论文图 3：在相同的多径信道上，比较 WMMSE 基线与四种 SVD 预编码方案，观察信噪比从 0 dB 增至 25 dB 时的速率变化。
 
 参考论文为 Hailong Liang、Qin Tao、Ben Wang 和 Zhaoyang Zhang 的 *Weighted Sum Rate Maximization for Multi-User MIMO-OTFS Systems over High-Mobility Scenarios*，IEEE Journal of Selected Topics in Signal Processing，2026。第 II 节给出信道模型，第 III 节介绍 WMMSE 和基于主导视距径（LoS）的 SVD 预编码，第 IV 节给出数值实验。[随项目附带的论文 PDF](./Weighted_Sum_Rate_Maximization_for_Multi-User_MIMO-OTFS_Systems_over_High-Mobility_Scenarios.pdf) · [DOI](https://doi.org/10.1109/JSTSP.2026.3700518)
 
