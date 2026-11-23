@@ -4,16 +4,22 @@
 
 参考论文为 Hailong Liang、Qin Tao、Ben Wang 和 Zhaoyang Zhang 的 *Weighted Sum Rate Maximization for Multi-User MIMO-OTFS Systems over High-Mobility Scenarios*，IEEE Journal of Selected Topics in Signal Processing，2026。第 II 节给出信道模型，第 III 节介绍 WMMSE 和基于主导视距径（LoS）的 SVD 预编码，第 IV 节给出数值实验。[随项目附带的论文 PDF](./Weighted_Sum_Rate_Maximization_for_Multi-User_MIMO-OTFS_Systems_over_High-Mobility_Scenarios.pdf) · [DOI](https://doi.org/10.1109/JSTSP.2026.3700518)
 
+## 图 3 实验结果
+
+![论文图 3：WMMSE 和四种 SVD 预编码方案的平均加权和速率随 SNR 的变化](./figures/figure-3-wsr.png)
+
+图取自参考论文第 8 页，曲线为论文作者对 200 次蒙特卡洛仿真取平均的结果。在 0 至 25 dB 的六个 SNR 点上，WMMSE 的平均加权和速率均最高。在 25 dB 处，完整 CSI 配合注水的 SVD 方案最接近 WMMSE。论文为每个用户固定使用 5 条路径，本项目默认按用户随机抽取 1 至 5 条路径。[论文原图](./Weighted_Sum_Rate_Maximization_for_Multi-User_MIMO-OTFS_Systems_over_High-Mobility_Scenarios.pdf#page=8)
+
 ## 运行
 
-需要 MATLAB、Signal Processing Toolbox（`dftmtx`）和 Symbolic Math Toolbox（注水函数使用 `syms`、`solve` 和 `vpa`）。将 MATLAB 当前文件夹设为包含本 README 的大写 `Code` 目录，然后执行：
+需要 MATLAB、Signal Processing Toolbox（`dftmtx`）和 Symbolic Math Toolbox（注水函数使用 `syms`、`solve` 和 `vpa`）。将 MATLAB 当前文件夹设为包含本 README 和 `main.m` 的目录，然后执行：
 
 ```matlab
 rng(1, 'twister')   % 可选。重复实验时使用相同的随机种子
 main
 ```
 
-[main.m](./main.m) 会加载同目录下的 `functions/`，生成随机信道并绘制五条曲线。横轴为 SNR（dB），纵轴为按 OTFS 格点数 `M*N` 归一化、再对信道实现取平均的 WSR（bit/s/Hz）。每种方案的逐次结果保留在 MATLAB 工作区；默认设置下，每个结果矩阵有 5 行（信道实现）和 6 列（SNR 点）。例如，`mean(Rate_SVD_my_ww,1)` 就是图中“近似 CSI + 注水”的六个纵坐标。
+[main.m](./main.m) 会加载同目录下的 `functions/`，生成随机信道并绘制五条曲线。横轴为 SNR（dB），纵轴为按 OTFS 格点数 `M*N` 归一化、再对信道实现取平均的 WSR（bit/s/Hz）。每种方案的逐次结果保留在 MATLAB 工作区；默认设置下，每个结果矩阵有 200 行（信道实现）和 6 列（SNR 点）。例如，`mean(Rate_SVD_my_ww,1)` 就是图中“近似 CSI + 注水”的六个纵坐标。
 
 ## 五条曲线怎么读
 
@@ -35,4 +41,4 @@ CSI 指发射端设计预编码器时掌握的信道信息。每轮实验先生�
 
 默认 WMMSE 为每个用户配置 `d = N_R*M*N = 256` 条数据流，相对速率变化阈值为 `1e-3`，最多迭代 100 次。四种 SVD 方案为每个用户保留 `M*N = 64` 个模式。
 
-每个用户在运行开始时随机抽取 1 至 5 条路径，并在 `Mont = 5` 次信道实现中沿用该路径数。每轮重新抽取路径增益、方向、时延和多普勒。非视距径的平均功率为 0.01，整数时延取 0 至 10，归一化多普勒取值范围为 [0, 2)。
+每个用户在运行开始时随机抽取 1 至 5 条路径，并在 `Mont = 200` 次信道实现中沿用该路径数。每轮重新抽取路径增益、方向、时延和多普勒。非视距径的平均功率为 0.01，整数时延取 0 至 10，归一化多普勒取值范围为 [0, 2)。
